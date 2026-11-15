@@ -1,0 +1,209 @@
+* { box-sizing: border-box; }
+
+.ind-body {
+   font-family: "Segoe UI", Roboto, Arial, sans-serif;
+   color: black;
+   line-height: 1.5;
+   max-width: 860px;
+   margin: 20px auto;
+   padding: 0 16px 40px;
+   min-height: 100vh;
+   background: url("img/bg2.jpg") center / cover fixed no-repeat;
+   background-color: black;
+}
+
+.container{
+   background-color: rgba(0, 0, 0, 0.8);
+   margin: 20px;
+   padding: 20px;
+   border-radius: 10px;
+}
+
+h1 {
+   text-align: center;
+   color: #fff;
+   font-size: 2.4rem;
+   margin: 28px 0 28px;
+   letter-spacing: 1px;
+}
+
+/* ---------- kartice ---------- */
+.card {
+   background: rgba(255, 255, 255, 0.96);
+   border-radius: 10px;
+   padding: 22px 26px;
+   margin-bottom: 26px;
+}
+
+.card h2 {
+   margin-top: 0;
+   font-size: 1.4rem;
+}
+
+hr {
+   border: 0;
+   border-top: 1px solid black;
+   margin: 26px 0;
+}
+
+/* ---------- tekst ---------- */
+
+.hl  { 
+   background: yellow; 
+   padding: 0 3px; 
+   border-radius: 10px; 
+}
+.err { 
+   color: #b00; 
+}
+.ok  { 
+   color: #070; 
+}
+
+a { 
+   color: blue; 
+}
+a:hover{
+   color: darkblue;
+}
+
+/* ---------- forme ---------- */
+label {
+   font-weight: 600;
+   cursor: pointer;
+}
+
+input[type="checkbox"] {
+   accent-color: red;
+   width: 16px;
+   height: 16px;
+   vertical-align: middle;
+}
+
+input[type="text"], input[type="password"], input:not([type]) {
+   padding: 7px 10px;
+   border: 1px solid #cbd5e1;
+   border-radius: 10px;
+   font-size: 0.95rem;
+   background: #f8fafc;
+}
+
+input:focus {
+   outline: none;
+   border-color: blue;
+}
+
+button {
+   padding: 8px 16px;
+   border: 0;
+   border-radius: 10px;
+   background: blue;
+   color: #fff;
+   font-size: 0.95rem;
+   font-weight: 600;
+   cursor: pointer;
+}
+
+button:hover  { 
+   background: darkblue; 
+}
+button:active { 
+   transform: translateY(1px); 
+}
+
+#resetBtn, #outBtn { background: #64748b; }
+#resetBtn:hover, #outBtn:hover { background: #475569; }
+
+/* ---------- ispis ---------- */
+pre {
+   background: #0b1220;
+   color: #86efac;
+   padding: 12px 14px;
+   border-radius: 10px;
+   overflow: auto;
+   white-space: pre-wrap;
+   font-family: Consolas, "Courier New", monospace;
+   font-size: 0.88rem;
+   min-height: 44px;
+}
+
+
+/* ---------- attacker.html ---------- */
+
+* {
+   box-sizing: border-box;
+}
+
+.att-body {
+   margin: 0;
+   min-height: 100vh;
+   font-family: Arial, sans-serif;
+
+   background-image: url("img/reward-wider.png");
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+}
+
+.att-layout {
+   min-height: 100vh;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: flex-end;
+
+   padding: 50px 8%;
+   gap: 20px;
+}
+
+.att-text {
+   background-color: rgb(245, 222, 179, 0.8);
+   border-radius: 10px;
+   width: 100%;
+   padding: 15px;
+   max-width: 550px;
+   text-align: right;
+   text-align: center
+}
+
+.att-text h1 {
+   font-size: 36px;
+   color: #a51d16;
+   margin-bottom: 25px;
+}
+
+.att-text p {
+   font-size: 19px;
+   color: #333;
+}
+
+#go {
+   padding: 16px 35px;
+   border: none;
+   border-radius: 10px;
+   display: block;
+   margin: 0 auto;
+
+   background: linear-gradient(135deg, #e6392f, #b71c1c);
+   color: white;
+
+   font-size: 18px;
+   font-weight: bold;
+   cursor: pointer;
+
+   transition: 1s;
+}
+
+#go:hover {
+   transform: scale(1.05);
+   background: #a51d16;
+}
+
+#msg {
+   font-weight: bold;
+   color: #a51d16;
+}
+
+iframe {
+   display: none;
+}

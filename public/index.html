@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="hr">
+  <head>
+    <meta charset="utf-8">
+    <title>Security</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body class="ind-body">
+    <div class="container">
+      <h1>Security</h1>
+
+      <!--------------------- SQL ------------------------->
+      <section class="card">
+        <h2>SQL ubacivanje (SQL Injection)</h2>
+
+        <p><b>Upute:</b> Unesite korisničko ime i PIN pa dohvatite privatnu poruku. Za napad (tautologija) u polje korisničko 
+        ime upišite <span class="hl">' OR 1=1 --</span>. Kada je ranjivost uključena, vraćaju se poruke svih korisnika;
+         kada je isključena, upit je parametriziran i ne vraća ništa.</p>
+        <label><input type="checkbox" id="sqli"> Ranjivost uključena</label>
+
+        <p>Korisničko ime: <input id="u" value="marko" size="25"> PIN: <input id="p" type="password" value="1234" size="6">
+        <button id="sqlBtn">Dohvati poruku</button></p>
+        <pre id="sqlOut">-</pre>
+
+        <hr>
+        <p><b>Upute:</b> Tražilica poruka ranjiva na UNION napad. U polje upišite
+            <span class="hl">' UNION SELECT username, secret FROM users --</span> da izvučete tuđe PIN-om zaštićene podatke kroz
+            nepovezanu tražilicu.</p>
+        <p>Pretraga poruka: <input id="q" size="45" value="Pozdrav svima, kako ste?">
+          <button id="searchBtn">Pretraži</button>
+        </p>
+        <pre id="searchOut">-</pre>
+      </section>
+
+      <!--------------------- CSRF ------------------------->
+      <section class="card">
+        <h2>Lažiranje zahtjeva na drugom sjedištu (CSRF)</h2>
+        <p><b>Upute:</b> Prijavite se kao <b>alice / alice123</b> (žrtva). Zatim u istom pregledniku otvorite 
+        <a href="/nagrada" target="_blank">attacker</a> i kliknite gumb. Kada je ranjivost uključena, novac se bez znanja korisnika prebaci
+         napadaču (<b>mallory</b>). Kada je isključena, zahtjev se 
+        odbija jer nema CSRF tokena.</p>
+        <label><input type="checkbox" id="csrf"> Ranjivost uključena</label>
+      
+        <div id="loginBox">
+          <p>Korisnik: <input id="lu" value="alice" size="10"> 
+            Zaporka: <input id="lp" type="password" value="alice123" size="10"> 
+            <button id="loginBtn">Prijava</button>
+          </p>
+        </div>
+
+        <div id="appBox" style="display:none">
+          <p>Prijavljen: <b id="who"></b> | Stanje: <b id="bal"></b> EUR <button id="refBtn">Osvježi</button> <button id="outBtn">Odjava</button></p>
+        <p>Primatelj: <input id="to" value="mallory" size="10"> Iznos: <input id="amt" value="10" size="6"> <button id="trBtn">Prebaci novac</button></p>
+          <pre id="tx">-</pre>
+        </div>
+
+        <p><button id="resetBtn">Reset stanja računa</button></p>
+      </section>
+
+    </div>
+
+    <script>
+    
+      const $ = id => document.getElementById(id);
+      let token = null;
+      const post = (url, body, h = {}) => fetch(url, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json', ...h }, 
+        body: JSON.stringify(body) 
+      }).then(async r => ({ 
+        status: r.status, 
+        data: await r.json() 
+      }));
+
+      async function loadFlags() { 
+        const f = await (await fetch('/api/flags')).json();
+        $('sqli').checked = f.sqli; 
+        $('csrf').checked = f.csrf; 
+      }
+
+      $('sqli').onchange = e => post('/api/flags', { 
+        name: 'sqli', 
+        value: e.target.checked 
+      });
+
+      $('csrf').onchange = e => post('/api/flags', { 
+        name: 'csrf', 
+        value: e.target.checked 
+      });
+
+      $('sqlBtn').onclick = async () => {
+        const r = await post('/api/sqli', { username: $('u').value, pin: $('p').value });
+        const d = r.data;
+
+        $('sqlOut').textContent = `Način: ${d.vulnerable ? 'RANJIVO' : 'ZAŠTIĆENO'}\nUpit: ${d.sql}\n` +
+        (d.error ? `Greška: ${d.error}` : `Broj redaka: ${d.rows.length}\n` + d.rows.map(x => `  [${x.id}] ${x.username}: ${x.secret}`).join('\n'));
+      };
+
+      $('searchBtn').onclick = async () => {
+          const r = await post('/api/search', { q: $('q').value });
+          const d = r.data;
+
+          $('searchOut').textContent = `Način: ${d.vulnerable ? 'RANJIVO' : 'ZAŠTIĆENO'}\nUpit: ${d.sql}\n` +
+            (d.error ? `Greška: ${d.error}` : d.rows.map(x => `  ${x.author}: ${x.body}`).join('\n'));
+      };
+
+      async function refresh() {
+        const m = await (await fetch('/api/me')).json();
+        $('loginBox').style.display = m.user ? 'none' : ''; 
+        $('appBox').style.display = m.user ? '' : 'none';
+
+        if (!m.user) { token = null; return; }
+        token = m.csrfToken; $('who').textContent = m.user; $('bal').textContent = m.balance;
+        $('tx').textContent = 'Transakcije:\n' + (m.transactions.map(t => `  ${t.time}  ${t.from} -> ${t.to}: ${t.amount} EUR`).join('\n') || '  (nema)') +
+        '\nStanja svih računa: ' + JSON.stringify(m.balances);
+      }
+
+      $('loginBtn').onclick = async () => { 
+        const r = await post('/api/login', { username: $('lu').value, password: $('lp').value }); 
+        refresh(); 
+      };
+
+      $('outBtn').onclick = async () => { 
+        await post('/api/logout', {}); refresh(); 
+      };
+
+      $('refBtn').onclick = refresh;
+
+      $('trBtn').onclick = async () => { 
+        const r = await post('/api/transfer', { to: $('to').value, amount: $('amt').value }, { 'x-csrf-token': token });
+        refresh();
+      };
+
+      $('resetBtn').onclick = async () => { 
+        await post('/api/reset', {}); 
+        refresh(); 
+      };
+
+      loadFlags(); 
+      refresh();
+
+    </script>
+  </body>
+</html>

